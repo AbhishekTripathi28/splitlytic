@@ -120,3 +120,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@utility gradient {
+  @apply bg-gradient-to-r from-[#37bebc] to-[#13605f];
+}
+
+@utility gradient-title {
+  @apply gradient font-extrabold tracking-tighter text-transparent bg-clip-text pb-1 pr-2;
+}
+
+html {
+  scroll-behavior:smooth ;
+}

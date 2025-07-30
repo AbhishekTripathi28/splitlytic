@@ -48,7 +48,7 @@ export default function ContactsPage() {
   const { users, groups } = data || { users: [], groups: [] };
 
   return (
-    <div className="container mx-auto py-6 pt-16">
+    <div className="container mx-auto py-6 pt-20">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-6">
         <h1 className="text-5xl gradient-title">Contacts</h1>
         <Button onClick={() => setIsCreateGroupModalOpen(true)}>

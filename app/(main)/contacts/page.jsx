@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/convex/_generated/api";
@@ -51,10 +51,12 @@ export default function ContactsPage() {
     <div className="container mx-auto py-6 pt-20">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-6">
         <h1 className="text-5xl gradient-title">Contacts</h1>
+        <Suspense>
         <Button onClick={() => setIsCreateGroupModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create Group
         </Button>
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,14 +141,15 @@ export default function ContactsPage() {
           )}
         </div>
       </div>
-
+      <Suspense>
       <CreateGroupModal
         isOpen={isCreateGroupModalOpen}
         onClose={() => setIsCreateGroupModalOpen(false)}
         onSuccess={(groupId) => {
           router.push(`/groups/${groupId}`);
         }}
-      />
+        />
+        </Suspense>
     </div>
   );
 }

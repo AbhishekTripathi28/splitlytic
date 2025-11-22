@@ -8,13 +8,13 @@ import Header from "@/components/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Splitr",
+  title: "Splitlytic",
   description: "The smartest way to split expenses with friends",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/logos/logo-s.png" sizes="any" />
       </head>

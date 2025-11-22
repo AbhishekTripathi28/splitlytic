@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Users, User } from "lucide-react";
-import { CreateGroupModal } from "./components/create-group-modal";
+import { CreateGroupModal } from "../../../components/contacts-page/create-group-modal";
 
 export default function ContactsPage() {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
@@ -51,12 +51,12 @@ export default function ContactsPage() {
     <div className="container mx-auto py-6 pt-20">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mb-6">
         <h1 className="text-5xl gradient-title">Contacts</h1>
-        <Suspense>
+        {/* <Suspense fallback={<BarLoader width={"100%"} color="#36d7b7"/>}> */}
         <Button onClick={() => setIsCreateGroupModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Create Group
         </Button>
-        </Suspense>
+        {/* </Suspense> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,7 +141,7 @@ export default function ContactsPage() {
           )}
         </div>
       </div>
-      <Suspense>
+      {/* <Suspense fallback={<BarLoader width={"100%"} color="#36d7b7"/>}> */}
       <CreateGroupModal
         isOpen={isCreateGroupModalOpen}
         onClose={() => setIsCreateGroupModalOpen(false)}
@@ -149,7 +149,7 @@ export default function ContactsPage() {
           router.push(`/groups/${groupId}`);
         }}
         />
-        </Suspense>
+        {/* </Suspense> */}
     </div>
   );
 }

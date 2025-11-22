@@ -13,9 +13,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Users, CreditCard, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { ExpenseSummary } from "./components/expense-summary";
-import { BalanceSummary } from "./components/balance-summary";
-import { GroupList } from "./components/group-list";
+import { ExpenseSummary } from "../../../components/dashboard-page/expense-summary";
+import { BalanceSummary } from "../../../components/dashboard-page/balance-summary";
+import { GroupList } from "../../../components/dashboard-page/group-list";
 
 export default function Dashboard() {
   const { data: balances, isLoading: balancesLoading } = useConvexQuery(

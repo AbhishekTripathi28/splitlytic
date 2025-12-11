@@ -18,11 +18,13 @@ export const getUserBalances = query({
     /* tallies */
     let youOwe = 0;
     let youAreOwed = 0;
+    let currency 
     const balanceByUser = {};
 
     for (const e of expenses) {
       const isPayer = e.paidByUserId === user._id;
       const mySplit = e.splits.find((s) => s.userId === user._id);
+      currency = e.currency
 
       if (isPayer) {
         for (const s of e.splits) {
@@ -68,6 +70,7 @@ export const getUserBalances = query({
         name: counterpart?.name ?? "Unknown",
         imageUrl: counterpart?.imageUrl,
         amount: Math.abs(net),
+        currency: currency,
       };
       net > 0 ? youAreOwedByList.push(base) : youOweList.push(base);
     }
@@ -80,6 +83,7 @@ export const getUserBalances = query({
       youAreOwed,
       totalBalance: youAreOwed - youOwe,
       oweDetails: { youOwe: youOweList, youAreOwedBy: youAreOwedByList },
+      currency: currency
     };
   },
 });
@@ -98,7 +102,8 @@ export const getTotalSpent = query({
       .query("expenses")
       .withIndex("by_date", (q) => q.gte("date", startOfYear))
       .collect();
-
+      
+      
     // Filter for expenses where user is involved
     const userExpenses = expenses.filter(
       (expense) =>
@@ -108,8 +113,10 @@ export const getTotalSpent = query({
 
     // Calculate total spent (personal share only)
     let totalSpent = 0;
+    let currency = "₹";
 
     userExpenses.forEach((expense) => {
+      currency = expense.currency || "₹";
       const userSplit = expense.splits.find(
         (split) => split.userId === user._id
       );
@@ -118,7 +125,7 @@ export const getTotalSpent = query({
       }
     });
 
-    return totalSpent;
+    return {currency: currency, totalSpent: totalSpent};
   },
 });
 
@@ -153,8 +160,10 @@ export const getMonthlySpending = query({
       monthlyTotals[monthDate.getTime()] = 0;
     }
 
+    let currency = "₹";
     // Sum up expenses by month
     userExpenses.forEach((expense) => {
+      currency = expense.currency || "₹";
       const date = new Date(expense.date);
       const monthStart = new Date(
         date.getFullYear(),
@@ -174,6 +183,7 @@ export const getMonthlySpending = query({
 
     // Convert to array format
     const result = Object.entries(monthlyTotals).map(([month, total]) => ({
+      currency: currency,
       month: parseInt(month),
       total,
     }));
@@ -208,8 +218,10 @@ export const getUserGroups = query({
           .collect();
 
         let balance = 0;
+        let currency = "₹";
 
         expenses.forEach((expense) => {
+          currency = expense.currency || "₹";
           if (expense.paidByUserId === user._id) {
             // User paid for others
             expense.splits.forEach((split) => {
@@ -256,6 +268,7 @@ export const getUserGroups = query({
           ...group,
           id: group._id,
           balance,
+          currency: currency,
         };
       })
     );

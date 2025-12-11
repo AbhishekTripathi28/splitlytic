@@ -40,7 +40,7 @@ export default function Dashboard() {
     monthlySpendingLoading;
 
   return (
-    <div className="container mx-auto py-6 pt-20 space-y-6">
+    <div className="container mx-auto  p-6 pt-20 space-y-6">
       {isLoading ? (
         <div className="w-full py-12 flex justify-center">
           <BarLoader width={"100%"} color="#36d7b7" />
@@ -69,14 +69,14 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold">
                   {balances?.totalBalance > 0 ? (
                     <span className="text-green-600">
-                      +${balances?.totalBalance.toFixed(2)}
+                      +{balances?.currency}{balances?.totalBalance.toFixed(2)}
                     </span>
                   ) : balances?.totalBalance < 0 ? (
                     <span className="text-red-600">
-                      -${Math.abs(balances?.totalBalance).toFixed(2)}
+                      -{balances?.currency}{Math.abs(balances?.totalBalance).toFixed(2)}
                     </span>
                   ) : (
-                    <span>$0.00</span>
+                    <span>{balances?.currency}0.00</span>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -97,7 +97,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  ${balances?.youAreOwed.toFixed(2)}
+                  {balances?.currency}{balances?.youAreOwed.toFixed(2)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   From {balances?.oweDetails?.youAreOwedBy?.length || 0} people
@@ -115,7 +115,7 @@ export default function Dashboard() {
                 {balances?.oweDetails?.youOwe?.length > 0 ? (
                   <>
                     <div className="text-2xl font-bold text-red-600">
-                      ${balances?.youOwe.toFixed(2)}
+                      {balances?.currency}{balances?.youOwe.toFixed(2)}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       To {balances?.oweDetails?.youOwe?.length || 0} people
@@ -123,7 +123,7 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    <div className="text-2xl font-bold">$0.00</div>
+                    <div className="text-2xl font-bold">{balances?.currency}0.00</div>
                     <p className="text-xs text-muted-foreground mt-1">
                       You don't owe anyone
                     </p>

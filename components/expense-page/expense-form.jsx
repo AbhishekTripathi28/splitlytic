@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { getAllCategories } from "@/lib/expense-categories";
 import { CategorySelector } from "./category-selector";
+import { CurrencySelector } from "./currency-selector";
 
 // Form schema validation
 const expenseSchema = z.object({
@@ -36,6 +37,7 @@ const expenseSchema = z.object({
     .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
       message: "Amount must be a positive number",
     }),
+  currency: z.string().optional(),
   category: z.string().optional(),
   date: z.date(),
   paidByUserId: z.string().min(1, "Payer is required"),
@@ -68,6 +70,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
     defaultValues: {
       description: "",
       amount: "",
+      currency: "₹",
       category: "",
       date: new Date(),
       paidByUserId: currentUser?._id || "",
@@ -79,6 +82,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
   // Watch for changes
   const amountValue = watch("amount");
   const paidByUserId = watch("paidByUserId");
+  const selectedCurrency = watch("currency");
 
   // When a user is added or removed, update the participant list
   useEffect(() => {
@@ -128,6 +132,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
       await createExpense.mutate({
         description: data.description,
         amount: amount,
+        currency: data.currency || "Rupee",
         category: data.category || "Other",
         date: data.date.getTime(), // Convert to timestamp
         paidByUserId: data.paidByUserId,
@@ -173,17 +178,24 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
 
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              placeholder="0.00"
-              type="number"
-              step="0.01"
-              min="0.01"
-              {...register("amount")}
-            />
-            {errors.amount && (
-              <p className="text-sm text-red-500">{errors.amount.message}</p>
-            )}
+            <div className="flex gap-2">
+              <CurrencySelector
+                onChange={(currency) => {
+                  setValue("currency", currency);
+                }}
+              />
+              <Input
+                id="amount"
+                placeholder="0.00"
+                type="number"
+                step="0.01"
+                min="0.01"
+                {...register("amount")}
+              />
+              {errors.amount && (
+                <p className="text-sm text-red-500">{errors.amount.message}</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -318,6 +330,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
               </p>
               <SplitSelector
                 type="equal"
+                selectedCurrency={selectedCurrency}
                 amount={parseFloat(amountValue) || 0}
                 participants={participants}
                 paidByUserId={paidByUserId}
@@ -330,6 +343,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
               </p>
               <SplitSelector
                 type="percentage"
+                selectedCurrency={selectedCurrency}
                 amount={parseFloat(amountValue) || 0}
                 participants={participants}
                 paidByUserId={paidByUserId}
@@ -342,6 +356,7 @@ export function ExpenseForm({ type = "individual", onSuccess }) {
               </p>
               <SplitSelector
                 type="exact"
+                selectedCurrency={selectedCurrency}
                 amount={parseFloat(amountValue) || 0}
                 participants={participants}
                 paidByUserId={paidByUserId}

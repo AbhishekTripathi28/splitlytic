@@ -7,6 +7,7 @@ export const createExpense = mutation({
   args: {
     description: v.string(),
     amount: v.number(),
+    currency:v.string(),
     category: v.optional(v.string()),
     date: v.number(), // timestamp
     paidByUserId: v.id("users"),
@@ -53,6 +54,7 @@ export const createExpense = mutation({
     const expenseId = await ctx.db.insert("expenses", {
       description: args.description,
       amount: args.amount,
+      currency: args.currency ||"rupee",
       category: args.category || "Other",
       date: args.date,
       paidByUserId: args.paidByUserId,

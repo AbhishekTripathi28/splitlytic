@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export function GroupSelector({ onChange }) {
   const [selectedGroupId, setSelectedGroupId] = useState("");
@@ -39,9 +41,17 @@ export function GroupSelector({ onChange }) {
 
   if (!data?.groups || data.groups.length === 0) {
     return (
-      <div className="text-sm text-amber-600 p-2 bg-amber-50 rounded-md">
-        You need to create a group first before adding a group expense.
-      </div>
+      <>
+        <div className="text-sm text-amber-600 p-2 bg-amber-50 rounded-md">
+          You need to create a group first before adding a group expense.
+        </div>{" "}
+        <Button variant="outline" asChild className="w-full">
+          <Link href="/contacts?createGroup=true">
+            <Users className="mr-2 h-4 w-4" />
+            Create new group
+          </Link>
+        </Button>
+      </>
     );
   }
 

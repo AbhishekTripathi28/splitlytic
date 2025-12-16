@@ -27,7 +27,6 @@ export function ExpenseSummary({ monthlySpending, totalSpent }) {
     "Nov",
     "Dec",
   ];
-
   const chartData =
     monthlySpending?.map((item) => {
       const date = new Date(item.month);
@@ -51,13 +50,13 @@ export function ExpenseSummary({ monthlySpending, totalSpent }) {
           <div className="bg-muted rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Total this month</p>
             <h3 className="text-2xl font-bold mt-1">
-              ${monthlySpending?.[currentMonth]?.total.toFixed(2) || "0.00"}
+              {monthlySpending?.[currentMonth]?.currency}{monthlySpending?.[currentMonth]?.total.toFixed(2) || "0.00"}
             </h3>
           </div>
           <div className="bg-muted rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Total this year</p>
             <h3 className="text-2xl font-bold mt-1">
-              ${totalSpent?.toFixed(2) || "0.00"}
+              {totalSpent?.currency}{totalSpent?.totalSpent?.toFixed(2) || "0.00"}
             </h3>
           </div>
         </div>

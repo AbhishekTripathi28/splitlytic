@@ -147,6 +147,7 @@ async function createOneOnOneExpenses(ctx, users) {
     {
       description: "Cab ride to airport",
       amount: 450.0,
+      currency:"Rupee",
       category: "transportation", 
       date: oneWeekAgo,
       paidByUserId: user2._id,
@@ -160,6 +161,7 @@ async function createOneOnOneExpenses(ctx, users) {
     {
       description: "Movie tickets",
       amount: 500.0,
+       currency:"Rupee",
       category: "entertainment",
       date: oneWeekAgo + 2 * 24 * 60 * 60 * 1000,
       paidByUserId: user3._id,
@@ -173,6 +175,7 @@ async function createOneOnOneExpenses(ctx, users) {
     {
       description: "Groceries",
       amount: 1875.5,
+       currency:"Rupee",
       category: "groceries",
       date: oneMonthAgo,
       paidByUserId: user1._id,
@@ -186,6 +189,7 @@ async function createOneOnOneExpenses(ctx, users) {
     {
       description: "Internet bill",
       amount: 1200.0,
+       currency:"Rupee",
       category: "utilities",
       date: now - 3 * 24 * 60 * 60 * 1000,
       paidByUserId: user2._id,

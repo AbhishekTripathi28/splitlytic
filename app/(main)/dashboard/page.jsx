@@ -16,8 +16,16 @@ import Link from "next/link";
 import { ExpenseSummary } from "../../../components/dashboard-page/expense-summary";
 import { BalanceSummary } from "../../../components/dashboard-page/balance-summary";
 import { GroupList } from "../../../components/dashboard-page/group-list";
+import { useCurrencyConverter } from "@/hooks/use-currency-converter";
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
+  const [convertedTotal, setConvertedTotal] = useState({
+    total: 0,
+    converted: {},
+  });
+  const [convertedMonthly, setConvertedMonthly] = useState({});
+
   const { data: balances, isLoading: balancesLoading } = useConvexQuery(
     api.dashboard.getUserBalances
   );
@@ -33,11 +41,58 @@ export default function Dashboard() {
   const { data: monthlySpending, isLoading: monthlySpendingLoading } =
     useConvexQuery(api.dashboard.getMonthlySpending);
 
+  const { data: totalSpentByCurrency, isLoading: totalSpentByCurrencyLoading } =
+    useConvexQuery(api.dashboard.getTotalSpentByCurrency);
+
+  const {
+    data: monthlySpendingByCurrency,
+    isLoading: monthlySpendingByCurrencyLoading,
+  } = useConvexQuery(api.dashboard.getMonthlySpendingByCurrency);
+
+  // Convert total spent
+  useEffect(() => {
+    if (totalSpentByCurrency && !totalSpentLoading) {
+      convertToDefaultCurrency(totalSpentByCurrency).then(setConvertedTotal);
+    }
+  }, [totalSpentByCurrency]);
+
+  // Convert monthly spending
+  useEffect(() => {
+    if (monthlySpendingByCurrency && !monthlySpendingLoading) {
+      const convertedMonthlyData = {};
+
+      const convertMonthly = async () => {
+        for (const [month, currencyData] of Object.entries(
+          monthlySpendingByCurrency
+        )) {
+          const converted = await convertToDefaultCurrency(currencyData);
+          convertedMonthlyData[month] = converted.total;
+        }
+        setConvertedMonthly(convertedMonthlyData);
+      };
+
+      convertMonthly();
+    }
+  }, [
+    monthlySpendingByCurrency,
+    monthlySpendingLoading,
+  ]);
+
   const isLoading =
     balancesLoading ||
     groupsLoading ||
     totalSpentLoading ||
-    monthlySpendingLoading;
+    monthlySpendingLoading ||
+    totalSpentByCurrencyLoading ||
+    monthlySpendingByCurrencyLoading;
+
+  console.log("totalSpentByCurrency --->", totalSpentByCurrency);
+  console.log("monthlySpendingByCurrency --->", monthlySpendingByCurrency);
+
+  console.log("convertedTotal --->", convertedTotal);
+  console.log("convertedMonthly --->", convertedMonthly);
+
+  useCurrencyConverter(100, "USD", "EUR");
 
   return (
     <div className="container mx-auto  p-6 pt-20 space-y-6">
@@ -69,11 +124,13 @@ export default function Dashboard() {
                 <div className="text-2xl font-bold">
                   {balances?.totalBalance > 0 ? (
                     <span className="text-green-600">
-                      +{balances?.currency}{balances?.totalBalance.toFixed(2)}
+                      +{balances?.currency}
+                      {balances?.totalBalance.toFixed(2)}
                     </span>
                   ) : balances?.totalBalance < 0 ? (
                     <span className="text-red-600">
-                      -{balances?.currency}{Math.abs(balances?.totalBalance).toFixed(2)}
+                      -{balances?.currency}
+                      {Math.abs(balances?.totalBalance).toFixed(2)}
                     </span>
                   ) : (
                     <span>{balances?.currency}0.00</span>
@@ -97,7 +154,8 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  {balances?.currency}{balances?.youAreOwed.toFixed(2)}
+                  {balances?.currency}
+                  {balances?.youAreOwed.toFixed(2)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   From {balances?.oweDetails?.youAreOwedBy?.length || 0} people
@@ -115,7 +173,8 @@ export default function Dashboard() {
                 {balances?.oweDetails?.youOwe?.length > 0 ? (
                   <>
                     <div className="text-2xl font-bold text-red-600">
-                      {balances?.currency}{balances?.youOwe.toFixed(2)}
+                      {balances?.currency}
+                      {balances?.youOwe.toFixed(2)}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       To {balances?.oweDetails?.youOwe?.length || 0} people
@@ -123,7 +182,9 @@ export default function Dashboard() {
                   </>
                 ) : (
                   <>
-                    <div className="text-2xl font-bold">{balances?.currency}0.00</div>
+                    <div className="text-2xl font-bold">
+                      {balances?.currency}0.00
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       You don't owe anyone
                     </p>

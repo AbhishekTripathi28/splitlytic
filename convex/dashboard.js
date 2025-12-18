@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { getCurrentUser } from "./users";
 
 // Get user balances
 export const getUserBalances = query({
@@ -274,5 +275,91 @@ export const getUserGroups = query({
     );
 
     return enhancedGroups;
+  },
+});
+
+
+
+// Get monthly spending with currency information
+export const getMonthlySpendingByCurrency = query({
+  handler: async (ctx) => {
+    const { userId } = await getCurrentUser(ctx);
+    if (!userId) return null;
+
+    const now = new Date();
+    const oneYearAgo = new Date(now);
+    oneYearAgo.setFullYear(now.getFullYear() - 1);
+
+    // Get all expenses for this user in the past year
+    const expenses = await ctx.db
+      .query("expenses")
+      .filter((q) => q.gte(q.field("date"), oneYearAgo.getTime()))
+      .collect();
+
+    // Filter expenses where user is payer or participant
+    const userExpenses = expenses.filter((exp) => {
+      const isPayer = exp.paidByUserId === userId;
+      const isParticipant = exp.splits?.some((s) => s.userId === userId);
+      return isPayer || isParticipant;
+    });
+
+    // Group by month and currency
+    const groupedData = {};
+
+    for (const expense of userExpenses) {
+      const expenseDate = new Date(expense.date);
+      const monthKey = `${expenseDate.getFullYear()}-${String(
+        expenseDate.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      if (!groupedData[monthKey]) {
+        groupedData[monthKey] = {};
+      }
+
+      const currency = expense.currency || "USD";
+
+      if (!groupedData[monthKey][currency]) {
+        groupedData[monthKey][currency] = 0;
+      }
+
+      // Add user's share of the expense
+      const userSplit = expense.splits?.find((s) => s.userId === userId);
+      const amount = userSplit ? userSplit.amount : 0;
+      groupedData[monthKey][currency] += amount;
+    }
+
+    return groupedData;
+  },
+});
+
+// Get total spent by currency
+export const getTotalSpentByCurrency = query({
+  handler: async (ctx) => {
+    const { userId } = await getCurrentUser(ctx);
+    if (!userId) return null;
+
+    const expenses = await ctx.db.query("expenses").collect();
+
+    const userExpenses = expenses.filter((exp) => {
+      const isPayer = exp.paidByUserId === userId;
+      const isParticipant = exp.splits?.some((s) => s.userId === userId);
+      return isPayer || isParticipant;
+    });
+
+    const currencyTotals = {};
+
+    for (const expense of userExpenses) {
+      const currency = expense.currency || "USD";
+
+      if (!currencyTotals[currency]) {
+        currencyTotals[currency] = 0;
+      }
+
+      const userSplit = expense.splits?.find((s) => s.userId === userId);
+      const amount = userSplit ? userSplit.amount : 0;
+      currencyTotals[currency] += amount;
+    }
+
+    return currencyTotals;
   },
 });
